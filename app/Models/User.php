@@ -45,4 +45,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function repos() 
+    {
+        return $this->hasMany(Repo::class);
+    }
 }

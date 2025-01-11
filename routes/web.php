@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RepoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,9 +15,29 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', function () {
+    return Inertia::render('Home');
+})->middleware(['auth', 'verified'])->name('home');
+
+// Route::middleware(['auth', 'verified'])->group(function () {
+//     Route::get('/new', Inertia::render('New'))->name('new');
+//     Route::get('/home', Inertia::render('Home'))->name('home');
+// });
+
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/', function () {
+        return Inertia::render('Home');
+    })->name('home');
+
+    Route::get('/home', function () {
+        return Inertia::render('Home');
+    })->name('home');
+
+    Route::get('/new', [RepoController::class, 'createRepo'])->name('new');
+    Route::post('/store/repository', [RepoController::class, 'store'])->name('repositories.store');
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
