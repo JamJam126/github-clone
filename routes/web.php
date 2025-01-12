@@ -15,27 +15,25 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/', function () {
-    return Inertia::render('Home');
-})->middleware(['auth', 'verified'])->name('home');
+// Route::get('/', function () {
+//     return Inertia::render('Home');
+// })->middleware(['auth', 'verified'])->name('home');
 
 // Route::middleware(['auth', 'verified'])->group(function () {
-//     Route::get('/new', Inertia::render('New'))->name('new');
+//     // Route::get('/new', Inertia::render('New'))->name('new');
 //     Route::get('/home', Inertia::render('Home'))->name('home');
 // });
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/', function () {
         return Inertia::render('Home');
     })->name('home');
-
-    Route::get('/home', function () {
-        return Inertia::render('Home');
-    })->name('home');
-
     Route::get('/new', [RepoController::class, 'createRepo'])->name('new');
-    Route::post('/store/repository', [RepoController::class, 'store'])->name('repositories.store');
+    Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
+    Route::get('/', [RepoController::class, 'getRepo'])->name('repos');
+    Route::post('/store/repository', [RepoController::class, 'store'])->name('repos');
 });
 
 

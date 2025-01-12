@@ -2,24 +2,39 @@
     <AuthenticatedLayout>
         <!-- Side Bar -->
         <div class="main-side border-r h-full flex flex-col px-6 pt-4">
-            <div class="mt-8">
-                <h2 class="mb-1 text-sm font-semibold">Create your first project</h2>
+
+            <div class="mt-8" v-if="repos.length === 0">
+                <h2 class="mb-1 text-sm font-semibold">
+                    Create your first project</h2
+                >
+
                 <p 
                     class="text-sm mb-4" 
-                    style="line-height: 21px;"
+                    style="line-height: 21px;">
+                    Ready to start building? Create a repository for a new idea or bring over an existing repository to keep contributing to it.</p
                 >
-                    Ready to start building? Create a repository for a new idea or bring over an existing repository to keep contributing to it.
-                </p>
+                    
                 <div>
+
                     <Link
                         href="new" 
                         class="h-5 text-white font-medium rounded-md text-sm px-4 py-[6px] bg-[#238536] box-content"
                         as="button"
-                        style="border: solid 0.8px rgba(255, 255, 255, 0.1);"
+                        style="border: solid 0.8px rgba(255, 255, 255, 0.1);">
+                        Create repository</Link
                     >
-                        Create repository
-                    </Link>
+
                 </div>
+            </div>
+
+            <div v-else class="mt-8">
+                <ul>
+                    <li v-for="repo in repos" 
+                        :key="repo.id" 
+                        class="text-white">
+                        {{ repo.user_name }} / {{ repo.name }}</li
+                    >
+                </ul>
             </div>
         </div>
 
@@ -31,7 +46,14 @@
 </template>
 
 <script setup>
-    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-    import { Link } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Link } from '@inertiajs/vue3';
+import { defineProps } from 'vue';
+// import { Inertia } from '@inertiajs/vue3';
 
+const props = defineProps ({
+    repos: Array,
+});
+
+// console.log(props.repos);
 </script>

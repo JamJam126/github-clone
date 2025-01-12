@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Repo;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -13,6 +14,18 @@ class RepoController extends Controller
     public function createRepo() 
     {
         return Inertia::render('New');
+    }
+
+    public function getRepo() {
+        $repos = Repo::select('name', 'id')
+        ->addSelect([
+            'user_name' => User::select('name')
+                            ->whereColumn('id', 'repos.user_id')
+        ])
+        ->limit(5)
+        ->get();
+
+        return Inertia::render('Home', ['repos' => $repos]);
     }
 
     public function store(Request $request) 
