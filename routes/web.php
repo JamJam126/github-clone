@@ -6,6 +6,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -15,9 +17,9 @@ Route::get('/', function () {
     ]);
 });
 
-// Route::get('/', function () {
-//     return Inertia::render('Home');
-// })->middleware(['auth', 'verified'])->name('home');
+Route::get('/home', function () {
+    return Inertia::render('Home');
+})->middleware(['auth', 'verified'])->name('home');
 
 // Route::middleware(['auth', 'verified'])->group(function () {
 //     // Route::get('/new', Inertia::render('New'))->name('new');
@@ -27,12 +29,16 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/', function () {
+    Route::post('home', function () {
         return Inertia::render('Home');
     })->name('home');
+    // Route::get('home', function() {
+    //     return Inertia::render('Home');
+    // })->name('home');
+    
     Route::get('/new', [RepoController::class, 'createRepo'])->name('new');
     Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
-    Route::get('/', [RepoController::class, 'getRepo'])->name('repos');
+    // Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
     Route::post('/store/repository', [RepoController::class, 'store'])->name('repos');
 });
 
