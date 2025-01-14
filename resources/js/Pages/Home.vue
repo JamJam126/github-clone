@@ -32,8 +32,13 @@
                     <li v-for="repo in repos" 
                         :key="repo.id" 
                         class="text-white">
-                        {{ repo.user_name }} / {{ repo.name }}</li
-                    >
+
+                        <Link class=""
+                            :href="route('repo.show', { user: repo.user_name, repo: repo.name })">
+                            {{ repo.user_name }} / {{ repo.name }}</Link
+                        >
+
+                    </li>
                 </ul>
             </div>
         </div>

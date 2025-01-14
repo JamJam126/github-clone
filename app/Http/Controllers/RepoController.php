@@ -23,6 +23,7 @@ class RepoController extends Controller
                             ->whereColumn('id', 'repos.user_id')
         ])
         ->limit(5)
+        ->orderBy('created_at')
         ->get();
 
         return Inertia::render('Home', ['repos' => $repos]);
@@ -48,5 +49,17 @@ class RepoController extends Controller
             'message' => 'Repository created successfully',
             'repository' => $repo
         ], 201);
+    }
+
+    public function repo($repo) {
+
+        $info = Repo::select('name', 'id', 'created_at')
+            ->where('name', $repo)
+            ->addSelect([
+                'user_name' => User::select('name')
+                                    ->whereColumn('id', 'repos.user_id')
+            ])
+            ->first();
+        return Inertia::render('Repo', ['info' => $info]);
     }
 }
