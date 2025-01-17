@@ -26,4 +26,14 @@ class Repo extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function file()
+    {
+        return $this->hasMany(File::class);
+    }
+
+    public function commit()
+    {
+        return $this->hasMany(Commit::class);
+    }
 }

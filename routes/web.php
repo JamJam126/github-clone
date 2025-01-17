@@ -4,6 +4,8 @@ use App\Models\Repo;
 use App\Models\User;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RepoController;
+use App\Http\Controllers\CommitController;
+use App\Http\Controllers\FileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,12 +58,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //                     ->first()
     //     ]);
     // })->name('repo.show');
-    Route::get('/{repo}/', [RepoController::class, 'repo'])->name('repo.show');
-   
+    // Route::get('/{repo}/', [RepoController::class, 'repo'])->name('repo.show');
+    
+    Route::get('/{user}/{repo}', [RepoController::class, 'repo'])->name('repo.show');
     Route::get('/new', [RepoController::class, 'createRepo'])->name('new');
     Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
     // Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
     Route::post('/store/repository', [RepoController::class, 'store'])->name('repos.store');
+    Route::post('/commit-files', [CommitController::class, 'store'])->name('files.commit');
+    Route::post('/commited-files', [FileController::class, 'store'])->name('commited.files');
 });
 
 

@@ -34,7 +34,8 @@
                         class="text-white">
 
                         <Link class=""
-                            :href="route('repo.show', { user: repo.user_name, repo: repo.name })">
+                            :href="route('repo.show', { user: repo.user_name, repo: repo.name })"
+                            >
                             {{ repo.user_name }} / {{ repo.name }}</Link
                         >
 
