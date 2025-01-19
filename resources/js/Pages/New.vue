@@ -118,6 +118,7 @@ const createRepository = () => {
         onSuccess: () => {
             successMessage.value = `The repository "${form.name}" was created successfully!`;
             form.reset();
+            
         },
         onError: () => {
             document.getElementById('name').focus();

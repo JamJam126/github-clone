@@ -55,11 +55,19 @@ class RepoController extends Controller
 
         $info = Repo::select('name', 'id', 'created_at')
             ->where('name', $repo)
+            // ->with(['user' => function($query) use ($user) {
+            //     $query->select('id')->where('name', $user);
+            // }])
             ->addSelect([
                 'user_id' => User::select('id')
                                 ->where('name', $user)
+                                ->limit(1),
+                'user_name' => User::select('name')
+                                ->where('name', $user)
+                                ->limit(1)
             ])
             ->first();
+                
         return Inertia::render('Repo', ['info' => $info]);
     }
 }

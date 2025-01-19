@@ -65,7 +65,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
     // Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
     Route::post('/store/repository', [RepoController::class, 'store'])->name('repos.store');
-    Route::post('/commit-files', [CommitController::class, 'store'])->name('files.commit');
+    Route::post('/{user}/{repo}', [CommitController::class, 'store'])->name('files.commit');
     Route::post('/commited-files', [FileController::class, 'store'])->name('commited.files');
 });
 

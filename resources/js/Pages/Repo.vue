@@ -4,13 +4,17 @@
         
         <!-- {{ info.name }} -->
         <!-- {{ info.user_id }} -->
+          <!-- {{ info }} -->
+        {{ info }}
         <div class="">  
             <PrimaryButton @click.prevent="showTestModal">
                 Open</PrimaryButton
             >
             
             <CommitModal :showModal="openModal" 
-                        :repo_id="info.id" 
+                        :repo_id="info.id"
+                        :repo_name="info.name"
+                        :user_name="info.user_name" 
                         @update:showModal="openModal = $event" 
                         @commit="handleCommit"
             />
@@ -26,7 +30,7 @@ import { Head, useForm} from '@inertiajs/vue3';
 import { defineProps, ref } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import CommitModal from '@/Components/CommitModal.vue';
+import CommitModal from '@/Pages/CommitModal.vue';
 
 const props = defineProps({
     info: Array,
@@ -38,7 +42,7 @@ const showTestModal = () => {
     openModal.value = !openModal.value;
 }
 
-const handleCommit = async (files) => {
+const handleCommit = (files) => {
     for (const file of files) {
         const sizeInKB = (file.size / 1024).toFixed(2)
         const form = useForm ({
@@ -48,7 +52,7 @@ const handleCommit = async (files) => {
 
         form.post(route("commited.files")); 
 
-        console.log(props.response)
+        console.log(props.info.test)
 
         // console.log(index)
         // console.log(`${file.name}`)
