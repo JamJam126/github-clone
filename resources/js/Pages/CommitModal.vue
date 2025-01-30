@@ -14,7 +14,7 @@
                     >
                 </div>
                 <ul class="w-full pb-5 px-4">
-                    <li v-for="(file, index) in files" 
+                    <li v-for="(file, index) in commitData.files" 
                         :key="index"
                         class="p-2 bg-gray-800 border border-gray-500 rounded-lg flex justify-between">
                         {{ file.name }}
@@ -42,7 +42,8 @@
                     <input type="file" 
                         id="fileInput"
                         @change="handleFileChange" 
-                        multiple webkitdirectory
+                        multiple 
+                        webkitdirectory
                         class="text-black mt-5"
                         />
 
@@ -92,8 +93,6 @@ const props = defineProps ({
 
 })
 
-const files = ref([])
-const newFile = ref('')
 const commitMessage = ref('')
 
 const emit = defineEmits(['update:showModal', 'commit']);
@@ -109,10 +108,18 @@ const closeModal = () => {
 //     }
 // }
 
+const commitData = useForm({
+    id: props.repo_id,
+    message: '',
+    files: [],
+    relativePath: [] 
+});
+
 const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
     selectedFiles.forEach(file => {
-        files.value.push(file);
+       commitData.files.push(file)
+       commitData.relativePath.push(file.webkitRelativePath)
     });
 }
 
@@ -124,6 +131,8 @@ const cancelAddFile = () => {
     files.value = []
     emit('update:showModal', false)
 }
+
+// https://www.youtube.com/watch?v=dD2rea_fCFk
 
 const readFileContent = (file) => {
     return new Promise((resolve, reject) => {
@@ -146,27 +155,28 @@ const readFileContent = (file) => {
 
 const commitFiles = async () => {
     try {
-        const filesWithContent = await Promise.all(files.value.map(async (file) => {
-            const content = await readFileContent(file); // Read content asynchronously
-            return {
-                name: file.name,
-                size: (file.size / 1024).toFixed(2),
-                path: file.webkitRelativePath,
-                content: content
-            };
-        }));
+        // const filesWithContent = await Promise.all(files.value.map(async (file) => {
+        //     const content = await readFileContent(file); // Read content asynchronously
+        //     return {
+        //         name: file.name,
+        //         size: (file.size / 1024).toFixed(2),
+        //         path: file.webkitRelativePath,
+        //         content: content
+        //     };
+        // }));
 
-        const commitData = useForm({
-            id: props.repo_id,
-            message: commitMessage.value,
-            files: filesWithContent, 
-        });
+        // const commitData = useForm({
+        //     id: props.repo_id,
+        //     message: commitMessage.value,
+        //     files: filesWithContent, 
+        // });
+        commitData.message = commitMessage.value
 
         commitData.post(route('files.commit', { user: props.user_name, repo: props.repo_name }), {
             onFinish: (response) => {
                 console.log(response.data);
                 emit('update:showModal', false);
-                files.value = []; 
+                // files.value = []; 
             },
         });
 

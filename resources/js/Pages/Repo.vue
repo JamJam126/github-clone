@@ -5,19 +5,34 @@
         <!-- {{ info.name }} -->
         <!-- {{ info.user_id }} -->
           <!-- {{ info }} -->
-        {{ info }}
-        <div class="">  
-            <PrimaryButton @click.prevent="showTestModal">
-                Open</PrimaryButton
-            >
-            
-            <CommitModal :showModal="openModal" 
-                        :repo_id="info.id"
-                        :repo_name="info.name"
-                        :user_name="info.user_name" 
-                        @update:showModal="openModal = $event" 
-                        @commit="handleCommit"
-            />
+
+        
+        <div class="flex flew-col items-center">
+            <pre v-if="info.files" 
+                name="" 
+                id="testlg" 
+                class="w-[1200px] h-[90%] flex bg-black border border-gray-500">
+
+                <textarea name="" 
+                            readonly 
+                            class="bg-black w-full">
+                            {{ info.files }}</textarea
+                            >
+            </pre>
+        
+            <div class="">  
+                <PrimaryButton @click.prevent="showTestModal">
+                    Open</PrimaryButton
+                >
+                
+                <CommitModal :showModal="openModal" 
+                            :repo_id="info.id"
+                            :repo_name="info.name"
+                            :user_name="info.user_name" 
+                            @update:showModal="openModal = $event" 
+                            @commit="handleCommit"
+                />
+            </div>
         </div>
 
     </AuthenticatedLayout>
@@ -27,7 +42,7 @@
 <script setup> 
 
 import { Head, useForm} from '@inertiajs/vue3';
-import { defineProps, ref } from 'vue';
+import { computed, defineProps, ref, onMounted } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import CommitModal from '@/Pages/CommitModal.vue';

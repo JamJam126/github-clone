@@ -59,7 +59,7 @@ import axios from 'axios';
 // import { Inertia } from '@inertiajs/vue3';
 
 const props = defineProps({
-  repos: Array,
+    repos: Array,
 });
 
 // console.log(repos);
