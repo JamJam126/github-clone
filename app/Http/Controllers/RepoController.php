@@ -57,26 +57,11 @@ class RepoController extends Controller
     public function repo($user, $repo)
     {
 
-        $userInfo = User::select('id', 'name')
-            ->where('name', $user) 
-            ->first();
-
-        // if (!$userInfo) {
-        //     return abort(404, 'User not found');
-        // }
-
-        // $info = Repo::select('name', 'id', 'created_at')
-        //     ->where('name', $repo)
-        //     // ->with(['user' => function($query) use ($user) {
-        //     //     $query->select('id', 'name')->where('name', $user);
-        //     // }])
-        //     ->first();
-
         $info = Repo::select('repos.name', 'repos.id', 'repos.created_at', 'users.name as user_name')
-                        ->join('users', 'repos.user_id', '=', 'users.id')
-                        ->where('users.name', $user)
-                        ->where('repos.name', $repo)
-                        ->first();
+                    ->join('users', 'repos.user_id', '=', 'users.id')
+                    ->where('users.name', $user)
+                    ->where('repos.name', $repo)
+                    ->first();
 
         if (!$info) return abort(404, 'Repository not found');
 
@@ -88,7 +73,6 @@ class RepoController extends Controller
             'info' => $info,
             'files' => $file,
             'folders' => $folder,
-            'user' => $userInfo,
         ]);
     }
 
@@ -107,6 +91,39 @@ class RepoController extends Controller
             'repo' => $test,
             'files' => $files,
             'folders' => $subfolders,
+            'currFolder' => $folderName,
         ]);
+    }
+
+    public function displayRootFileContent($user, $repoName, $file)
+    {
+        // $fileNameCheck = File::where('name', $file)->exists();  
+        // dd($fileNameCheck);
+
+        // $repoIdCheck = File::where('repo_id', $repoId)->exists();
+        // dd($repoIdCheck);
+
+        // $folderIdCheck = File::whereNull('folder_id')->exists();
+        // dd($folderIdCheck);
+
+        // $repo = Repo::where('name', $repoName)->first();
+        $repoId = Repo::select('id')->where('name', $repoName)->value('id');
+        $fileContent = File::select('content')
+                            ->where('name', $file)
+                            ->whereNull('folder_id')
+                            ->where('repo_id', $repoId)
+                            ->first();
+        // dd($fileContent);
+
+        return Inertia::render('DisplayFileContent', [
+            'content' => $fileContent,
+            'test' => $file,
+        ]);
+    }
+
+    public function displayFileContent($user, $repo, $file)
+    {
+
+        return Inertia::render('DisplayFileContent');
     }
 }

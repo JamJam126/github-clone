@@ -61,6 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route::get('/{repo}/', [RepoController::class, 'repo'])->name('repo.show');
 
     Route::get('/{repo}/tree/{folder}', [RepoController::class, 'subdir'])->name('repo.subdir');
+    Route::get('/{repo}/tree/{folder}/{file}', [RepoController::class, 'displayFileContent'])->name('subdir.filecontent');
+    Route::get('/{user}/{repo}/{file}', [RepoController::class, 'displayRootFileContent'])->name('repo.filecontent');
     Route::get('/{user}/{repo}', [RepoController::class, 'repo'])->name('repo.show');
     Route::get('/new', [RepoController::class, 'createRepo'])->name('new');
     Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');

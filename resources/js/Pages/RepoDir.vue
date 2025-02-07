@@ -8,7 +8,7 @@
                     class="">
 
                     <Link class=""
-                              :href="route('repo.subdir', { repo: repo.name, folder: folder.name})">
+                          :href="route('repo.subdir', {repo: repo.name, folder: folder.name})">
                             {{ folder.name }}</Link    
                     >
 
@@ -18,8 +18,12 @@
                 class="">
                 <li v-for="file in files"
                     :key="file.id">
-                    {{ file.name }}</li
-                >
+                    <Link class=""
+                          :href="route('subdir.filecontent', {repo: repo.name, folder: currFolder, file: file.name})">
+                            {{ file.name }}</Link
+                            
+                    >
+                </li>
 
             </ul>
         </div>
@@ -39,6 +43,8 @@
         files: Array,
 
         folders: Array,
+
+        currFolder: Object,
     })
 
 </script>

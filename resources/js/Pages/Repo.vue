@@ -38,7 +38,11 @@
                     <li v-for="file in files"
                         :key="file.id"
                     >
-                        {{ file.name }}
+                        <Link class=""
+                              :href="route('repo.filecontent', { user: info.user_name,repo: info.name, file: file.name})">
+                            {{ file.name }}</Link
+                            
+                        >
                     </li>
                 </ul>
             </div>
