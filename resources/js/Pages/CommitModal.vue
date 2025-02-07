@@ -12,6 +12,8 @@
                             @click="closeModal">
                             X</button
                     >
+
+                
                 </div>
                 <ul class="w-full pb-5 px-4">
                     <li v-for="(file, index) in commitData.files" 
@@ -56,6 +58,8 @@
                                     @click.prevent="commitFiles">
                                     Commit</PrimaryButton
                                     >
+
+                        
                     </div>
                 </div>
             </div>

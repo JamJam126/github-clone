@@ -151,12 +151,8 @@ class CommitController extends Controller
         }
   
         $responseData = [
-            // 'id' => $request->input('id'),
-            // 'message' => $request->input('message'),
-            'files' => $test
-            // array_map(function ($file) {
-            //                 return base64_encode($file['content']);    
-            //             }, $files)  
+        
+            'files' => $test  
         ];
 
 
