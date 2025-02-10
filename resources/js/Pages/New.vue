@@ -56,10 +56,10 @@
                             id="visibility" 
                             v-model="form.visibility" required
                             >
-                        <option value="public">
+                        <option value="Public">
                             Public
                         </option>
-                        <option value="private">
+                        <option value="Private">
                             Private
                         </option></select
                     >
@@ -107,7 +107,7 @@ import TextInput from '@/Components/TextInput.vue';
 const form = useForm({
     name: '',
     description: '',
-    visibility: 'public',
+    visibility: 'Public',
 });
 
 const successMessage = ref('');
