@@ -196,7 +196,7 @@ class RepoController extends Controller
             });
         $folders = Folder::select('id', 'name')
             ->where('repo_id', $checkRepo->id)
-            ->whereNull('parent_id')
+            ->where('parent_id', $parentFolderId)
             ->get()
             ->map(function ($folder) {
                 $folder->type = 'folder';
@@ -236,12 +236,13 @@ class RepoController extends Controller
     }
     public function fileHandler($user, $repoName, $path) {}
 
-    public function getChildren($repoName, $folderName)
+    public function getChildren($repoName, $folderName, $folder_id)
     {
-        $CurrfolderId = Folder::select('id')->where('name', $folderName)->where('repo_id', $repoName)->value('id');
+        $repo_id = Repo::select("id")->where('name', $repoName)->value('id');
+
 
         $files = File::select('id', 'name')
-                     ->where('folder_id', $CurrfolderId)
+                     ->where('folder_id', $folder_id)
                      ->whereNull('repo_id')
                      ->get()
                      ->map(function ($file) {
@@ -250,7 +251,8 @@ class RepoController extends Controller
                     });
 
         $folders = Folder::select('id', 'name')
-                         ->where('parent_id', $CurrfolderId)
+                         ->where('parent_id', $folder_id)
+                         ->where('repo_id', $repo_id)
                          ->get()
                          ->map(function ($folder) {
                             $folder->type = 'folder';

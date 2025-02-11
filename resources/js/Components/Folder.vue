@@ -17,7 +17,7 @@
 
     <ul v-if="array[index] === 1" class="px-4">
         <li v-for="(item, index) in folderTree" :key="item.id" class="flex flex-col">
-            <Folder :name="item.name" :type="item.type" :index="index" :array="array"
+            <Folder :name="item.name" :type="item.type" :index="index" :array="array" :file_id="item.id" :repo_name="repo"
                 @handle-expansion="handleFolderExpansion" />
             <!-- <p>
                 {{ item.name }}
@@ -42,7 +42,7 @@ import { defineProps, defineEmits, ref } from 'vue';
 
 const props = defineProps({
     name: String,
-
+    file_id: String,
     type: String,
 
     index: Number,
@@ -63,7 +63,7 @@ const Test = (index) => {
 
 
 const fetchData = async () => {
-    const url = `/fileTree/${repo}/${folder}`; // Example URL
+    const url = `/fileTree/${repo}/${folder}/${props.file_id}`; // Example URL
     try {
         const response = await fetch(url);
 

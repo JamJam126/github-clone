@@ -13,6 +13,7 @@
                                 :index="index"
                                 :array="array"
                                 :repo_name="repo.name"
+                                :file_id="item.id"
                                 @handle-expansion="handleFolderExpansion"
                         />
                     </li>
