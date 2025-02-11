@@ -32,10 +32,10 @@
     </div>
 
     <ul v-if="array[index] === 1"
-        class="px-4 mt-4">
+        class="px-4">
         <li v-for="(item, index) in folderTree" 
             :key="item.id"
-            class="flex gap-2">
+            class="flex flex-col">
             <Folder :name="item.name" 
                     :type="item.type"
                     :index="index"
@@ -56,13 +56,14 @@
             width="24" 
             height="24" 
             viewBox="0 0 24 24"
-            class="text-[#9198a1]"
+            class="text-[#9198a1] h-6 w-6"
             >
             <path fill="currentColor" 
                     d="M19 19H8q-.825 0-1.412-.587T6 17V3q0-.825.588-1.412T8 1h6.175q.4 0 .763.15t.637.425l4.85 4.85q.275.275.425.638t.15.762V17q0 .825-.587 1.413T19 19m0-11h-3.5q-.625 0-1.062-.437T14 6.5V3H8v14h11zM4 23q-.825 0-1.412-.587T2 21V8q0-.425.288-.712T3 7t.713.288T4 8v13h10q.425 0 .713.288T15 22t-.288.713T14 23zM8 3v5zv14z"
                     />
         </svg>
-        {{ name }}</div
+        <p>{{ name }}</p>
+        </div
     >
 </template>
 
@@ -117,8 +118,8 @@
         }
        // Test(index)
        
-        console.log(folderTree.value)
-        console.log(props.array[index])
+        // console.log(folderTree.value)
+        console.log(index)
         // const testArray = folderTree.value.Array
         // console.log(testArray)
     }
