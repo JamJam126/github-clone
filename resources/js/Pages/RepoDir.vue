@@ -2,7 +2,20 @@
     <AuthenticatedLayout>
         <div class="bg-gray-950 w-full flex">
             <div class="w-80 h-auto border-r border-zinc-700">
-                <SubFolders :folder_tree="repo_tree" />
+                <!-- <SubFolders :folder_tree="repo_tree" /> -->
+                <ul v-if="repo_tree"
+                    class="px-4 mt-4">
+                    <li v-for="(item, index) in repo_tree" 
+                        :key="item.id"
+                        class="flex gap-2">
+                        <Folder :name="item.name" 
+                                :type="item.type"
+                                :index="index"
+                                :array="array"
+                                @handle-expansion="handleFolderExpansion"
+                        />
+                    </li> 
+                </ul>
             </div>
 
             <div class="flex flex-col w-full px-4">
@@ -91,10 +104,11 @@
 
 <script setup>
 
-    import { defineProps } from 'vue';
+    import { defineProps, ref } from 'vue';
     import { Link } from '@inertiajs/vue3';
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
     import SubFolders from '@/Components/SubFolders.vue';
+    import Folder from '@/Components/Folder.vue';
 
     const props = defineProps({
 
@@ -113,4 +127,13 @@
         // repo_files: Array,
     })
 
+    const Test = (index) => {
+
+        console.log(index)
+    }
+
+    const array = ref(Array(4).fill(0))
+    const handleFolderExpansion = (index) => {
+        array.value[index] = array.value[index] === 0 ? 1 : 0
+    };
 </script>

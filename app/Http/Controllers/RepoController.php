@@ -104,6 +104,7 @@ class RepoController extends Controller
 
         $folder = Folder::where('name', $folderName)->first();
 
+        
         $files = File::where('folder_id',  $folder->id)->get();
 
         $subfolders = Folder::where('parent_id', $folder->id)->get();
@@ -163,7 +164,39 @@ class RepoController extends Controller
 
         return Inertia::render('DisplayFileContent', [
             'content' => $decodedContent,
-            // 'test' => $file,
         ]);
     }
+
+    public function getChildren($repoName, $folderName)
+    {
+        $CurrfolderId = Folder::select('id')->where('name', $folderName)->where('repo_id', 1)->value('id');
+
+        $files = File::select('id', 'name')
+                     ->where('folder_id', $CurrfolderId)
+                     ->whereNull('repo_id')
+                     ->get()
+                     ->map(function ($file) {
+                        $file->type = 'file'; 
+                        return $file;
+                    });
+
+        $folders = Folder::select('id', 'name')
+                         ->where('parent_id', $CurrfolderId)
+                         ->get()
+                         ->map(function ($folder) {
+                            $folder->type = 'folder';
+                            return $folder;
+                        });
+        
+        $filesArray = $files->toArray();
+        $foldersArray = $folders->toArray();
+        $repoFoldersFilesTree = array_merge($foldersArray, $filesArray);
+
+        return response()->json([$repoFoldersFilesTree]);
+
+
+        
+    }
+
+    
 }

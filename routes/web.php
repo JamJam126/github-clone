@@ -60,13 +60,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // })->name('repo.show');
     // Route::get('/{repo}/', [RepoController::class, 'repo'])->name('repo.show');
 
+
+    Route::get('/fileTree/{repo}/{folder}', [RepoController::class, 'getChildren'])->name('folder.children'); // Testing
+
     Route::get('/{repo}/tree/{folder}', [RepoController::class, 'subdir'])->name('repo.subdir');
     Route::get('/{repo}/tree/{folder}/{file}', [RepoController::class, 'displayFileContent'])->name('subdir.filecontent');
     Route::get('/{user}/{repo}/{file}', [RepoController::class, 'displayRootFileContent'])->name('repo.filecontent');
     Route::get('/{user}/{repo}', [RepoController::class, 'repo'])->name('repo.show');
     Route::get('/new', [RepoController::class, 'createRepo'])->name('new');
     Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
-    // Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
     Route::post('/store/repository', [RepoController::class, 'store'])->name('repos.store');
     Route::post('/{user}/{repo}', [CommitController::class, 'store'])->name('files.commit');
     Route::post('/commited-files', [FileController::class, 'store'])->name('commited.files');
