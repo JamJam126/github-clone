@@ -59,14 +59,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //     ]);
     // })->name('repo.show');
     // Route::get('/{repo}/', [RepoController::class, 'repo'])->name('repo.show');
-
-
     Route::get('/fileTree/{repo}/{folder}', [RepoController::class, 'getChildren'])->name('folder.children'); // Testing
-
-    Route::get('/{repo}/tree/{folder}', [RepoController::class, 'subdir'])->name('repo.subdir');
-    Route::get('/{repo}/tree/{folder}/{file}', [RepoController::class, 'displayFileContent'])->name('subdir.filecontent');
-    Route::get('/{user}/{repo}/{file}', [RepoController::class, 'displayRootFileContent'])->name('repo.filecontent');
     Route::get('/{user}/{repo}', [RepoController::class, 'repo'])->name('repo.show');
+    //Route::get('/{repo}/tree/{folder}', [RepoController::class, 'subdir'])->name('repo.subdir');
+    //Route::get('/{repo}/tree/{folder}/{file}', [RepoController::class, 'displayFileContent'])->name('subdir.filecontent');
+    Route::get('/{user}/{repo}/{file}', [RepoController::class, 'displayRootFileContent'])->name('repo.filecontent');
+    Route::get('/{user}/{repo}/tree/{path}',[RepoController::class, "folderHandler"])->where('path', '.*')->name("repo.folderhandle");
+    Route::get("/{user}/{repo}/blob/{path}", [RepoController::class, "fileHandler"])->where('path', '.*')->name("repo.filehandler");
     Route::get('/new', [RepoController::class, 'createRepo'])->name('new');
     Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
     Route::post('/store/repository', [RepoController::class, 'store'])->name('repos.store');
