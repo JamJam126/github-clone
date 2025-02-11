@@ -27,25 +27,26 @@ class CommitController extends Controller
         $repo = $request->input('id');
         $files = $request->file('files');
         $paths = $request->input('relativePath');
-        
+
         // $fileTest = File::where('id', 6)->first();
         // $cont = $fileTest->content;
         // $test = base64_decode($cont);
         // $test = $con->content;
-        $test = []; 
+        $test = [];
 
         foreach ($files as $index => $file) {
             # code...
             $bomb = explode('/', $paths[$index]);
             $parent = null;
-            $curr = 1;
+            $curr = 0;
 
             if (sizeof($bomb) > 2) {
-                while ($curr != sizeof($bomb) - 1) {
+
+                while ($curr < count($bomb) -1) {
                     $folder = Folder::where('name', $bomb[$curr])
-                                ->where('repo_id', $repo)
-                                ->where('parent_id', $parent)
-                                ->first();
+                        ->where('repo_id', $repo)
+                        ->where('parent_id', $parent)
+                        ->first();
 
                     if (!$folder) {
 
@@ -60,31 +61,30 @@ class CommitController extends Controller
 
                     $parent = $folder->id;
                     $curr++;
-                } 
+                }
             }
 
             $existingFile = File::select()
-                        ->where('name', $bomb[count($bomb) - 1])
-                        ->first();
+                ->where('name', $bomb[count($bomb) - 1])->where('file_path', $paths[$index])->where('repo_id', $repo)
+                ->first();
 
             if (!$existingFile) {
 
                 $content = file_get_contents($file->getRealPath());
                 $base64Content = base64_encode($content);
-    
+
                 $newFile = new File();
                 $newFile->name = $file->getClientOriginalName();
                 $newFile->content = $base64Content;
                 $newFile->file_size = $file->getSize();
                 $newFile->file_path = $paths[$index];
-                $newFile->repo_id = (count($bomb) <= 2) ? $repo : null;
+                $newFile->repo_id = $repo ;
                 $newFile->folder_id = (count($bomb) <= 2) ? null : $parent;
-                
+
                 $newFile->save();
             }
-
         }
-        
+
 
         // foreach ($files as $index => $value) {
         //     # code...
@@ -115,9 +115,8 @@ class CommitController extends Controller
         //     $test[] = $path;
         // }
 
-        
-        foreach($paths as $path)
-        {
+
+        foreach ($paths as $path) {
             // $test1 = [];
 
             $bombs = explode('/', $path);
@@ -132,7 +131,7 @@ class CommitController extends Controller
             // REMOVE THE FIRST folder OF PATH
 
             // $newBomb = [];
-            // foreach ($bombs as $index => $value) 
+            // foreach ($bombs as $index => $value)
             //     if ($index != 0)  $newBomb[] = $value;
 
             // $newPath = implode('/', $newBomb);
@@ -144,15 +143,15 @@ class CommitController extends Controller
             //     $dummyData = Repo::select('name')
             //                         ->where('id', $index + 1)
             //                         ->first();
-                
+
             //     if($dummyData) $test[] = $dummyData;
             //     else $test[] = 1;
             // }
         }
-  
+
         $responseData = [
-        
-            'files' => $test  
+
+            'files' => $test
         ];
 
 
@@ -171,8 +170,8 @@ class CommitController extends Controller
         //     'repo' => $info
         // ])->with('refolderect_url', route('repo.show', ['id' => $request->input('id')]));
         // return response()->json([
-        //     'data' => $request->all(), 
+        //     'data' => $request->all(),
         //     'user_name' => $user ? $user->name : null,
         // ]);
     }
-} 
+}
