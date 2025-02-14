@@ -253,7 +253,7 @@ class RepoController extends Controller
     }
 
 
-        public function fileHandler($user, $repoName, $path) {
+    public function fileHandler($user, $repoName, $path) {
             $checkRepo = Repo::select()->where("name", $repoName)->get();
             $checkRepo = $checkRepo[0];
             if ($checkRepo->visibility == "private" && Auth::id() !== $checkRepo->user_id) {
