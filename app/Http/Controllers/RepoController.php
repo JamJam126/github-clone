@@ -287,7 +287,7 @@ class RepoController extends Controller
             return Inertia::render('DisplayFileContent', [
                 'content' => $decodedContent,
             ]);
-    
+    }
 
     public function getChildren($repoName, $folderName, $folderId)
     {
@@ -295,7 +295,7 @@ class RepoController extends Controller
 
         $repo_id = Repo::select("id")->where('name', $repoName)->value('id');
         $files = File::select('id', 'name')
-                     ->where('folder_id', $CurrfolderId)
+                     ->where('folder_id', $folderId)
                      ->whereNull('repo_id')
                      ->get()
                      ->map(function ($file) {
@@ -304,7 +304,7 @@ class RepoController extends Controller
                     });
 
         $folders = Folder::select('id', 'name')
-                         ->where('parent_id', $CurrfolderId)
+                         ->where('parent_id', $folderId)
                          ->get()
                          ->map(function ($folder) {
                             $folder->type = 'folder';
