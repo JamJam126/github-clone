@@ -3,19 +3,10 @@
         <div class="bg-gray-950 w-full flex">
             <div class="w-80 h-auto border-r border-zinc-700">
                 <!-- <SubFolders :folder_tree="repo_tree" /> -->
-                <ul v-if="repo_tree"
-                    class="px-4 mt-4">
-                    <li v-for="(item, index) in repo_tree"
-                        :key="item.id"
-                        class="flex flex-col">
-                        <Folder :name="item.name"
-                                :type="item.type"
-                                :repo_name="repo.name"
-                                :file_id="item.id"
-                                :index="index"
-                                :array="array"
-                                @handle-expansion="handleFolderExpansion"
-                        />
+                <ul v-if="repo_tree" class="px-4 mt-4">
+                    <li v-for="(item, index) in repo_tree" :key="item.id" class="flex flex-col">
+                        <Folder :name="item.name" :type="item.type" :repo_name="repo.name" :file_id="item.id"
+                            :index="index" :array="array" @handle-expansion="handleFolderExpansion" />
                     </li>
                 </ul>
             </div>
@@ -48,7 +39,7 @@
                                     <Link class="flex gap-2" :href="route('repo.folderhandle', {
                                         user: repo_owner,
                                         repo: repo.name,
-                                        path: `${currPath}/${folder.name}`,
+                                        path: `${currFolder}/${folder.name}`,
                                     })">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         class="text-[#9198a1]">
@@ -65,7 +56,7 @@
                                     <Link class="flex gap-2" :href="route('repo.filehandler', {
                                         user: repo_owner,
                                         repo: repo.name,
-                                        path: `${currPath}/${file.name}`,
+                                        path: `${currFolder}/${file.name}`,
 
                                     })">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -90,10 +81,10 @@
 
 <script setup>
 
-    import { defineProps, ref } from 'vue';
-    import { Link } from '@inertiajs/vue3';
-    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-    import Folder from '@/Components/Folder.vue';
+import { defineProps, ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Folder from '@/Components/Folder.vue';
 
 const props = defineProps({
 
@@ -103,7 +94,7 @@ const props = defineProps({
     currFolder: Object,
     repo_tree: Array,
     repo_owner: String,
-    currPath: String,
+    currFolder: String,
 
     // repo_folders: Array,
 
@@ -111,16 +102,16 @@ const props = defineProps({
 })
 
 
-    const Test = (index) => {
+const Test = (index) => {
 
-        console.log(index)
+    console.log(index)
 
-    }
+}
 
-    const array = ref(Array(props.repo_tree.length).fill(0))
+const array = ref(Array(props.repo_tree.length).fill(0))
 
-    const handleFolderExpansion = (index) => {
-        array.value[index] = array.value[index] === 0 ? 1 : 0
-    };
+const handleFolderExpansion = (index) => {
+    array.value[index] = array.value[index] === 0 ? 1 : 0
+};
 
 </script>
