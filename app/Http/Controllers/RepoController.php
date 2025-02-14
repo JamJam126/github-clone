@@ -196,7 +196,7 @@ class RepoController extends Controller
             });
         $folders = Folder::select('id', 'name')
             ->where('repo_id', $checkRepo->id)
-            ->whereNull('parent_id')
+            ->where('parent_id', $parentFolderId)
             ->get()
             ->map(function ($folder) {
                 $folder->type = 'folder';
@@ -206,19 +206,21 @@ class RepoController extends Controller
         $filesArray = $files->toArray();
         $foldersArray = $folders->toArray();
         $repoFoldersFilesTree = array_merge($foldersArray, $filesArray);
+        // It does not take null as parent id because if the parent id is Null is it parent
+        // so we retrieve the the first parent id
         for ($i = 0; $i < sizeof($pathArray); $i++) {
-
             $searchFolder =
-                Folder::select('id', 'name', 'parent_id')
-                ->where('repo_id', $checkRepo->id)
-                ->where('parent_id', $parentFolderId)
-                ->where('name', $pathArray[$i])
-                ->first();
+            Folder::select('id', 'name', 'parent_id')
+            ->where('repo_id', $checkRepo->id)
+            ->where('parent_id', $parentFolderId)
+            ->where('name', $pathArray[$i])
+            ->first();
             if ($searchFolder) {
                 $parentFolderId = $searchFolder->id;
             }
         }
 
+        // dd($parentFolderId);
         $files = File::where('folder_id',  $parentFolderId)->get();
         // dd($files);
         $subfolders = Folder::where('parent_id', $parentFolderId)->where('repo_id', $checkRepo->id)->get();
@@ -231,32 +233,34 @@ class RepoController extends Controller
             'repo_tree' => $repoFoldersFilesTree,
             'files' => $files,
             'folders' => $subfolders,
-            'currFolder' => $pathArray[sizeof($pathArray) -1],
+            'currFolder' => $path,
         ]);
     }
     public function fileHandler($user, $repoName, $path) {}
 
-    public function getChildren($repoName, $folderName)
+    public function getChildren($repoName, $folderName, $folder_id)
     {
-        $CurrfolderId = Folder::select('id')->where('name', $folderName)->where('repo_id', 1)->value('id');
+        $repo_id = Repo::select("id")->where('name', $repoName)->value('id');
+
 
         $files = File::select('id', 'name')
-                     ->where('folder_id', $CurrfolderId)
+                     ->where('folder_id', $folder_id)
                      ->whereNull('repo_id')
                      ->get()
                      ->map(function ($file) {
-                        $file->type = 'file'; 
+                        $file->type = 'file';
                         return $file;
                     });
 
         $folders = Folder::select('id', 'name')
-                         ->where('parent_id', $CurrfolderId)
+                         ->where('parent_id', $folder_id)
+                         ->where('repo_id', $repo_id)
                          ->get()
                          ->map(function ($folder) {
                             $folder->type = 'folder';
                             return $folder;
                         });
-        
+
         $filesArray = $files->toArray();
         $foldersArray = $folders->toArray();
         $repoFoldersFilesTree = array_merge($foldersArray, $filesArray);
@@ -264,6 +268,6 @@ class RepoController extends Controller
         return response()->json([$repoFoldersFilesTree]);
 
 
-        
+
     }
 }
