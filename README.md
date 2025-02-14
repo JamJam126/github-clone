@@ -12,7 +12,7 @@ To get started with the project, follow these steps:
 1. **Clone the repository**: `[git clone https://github.com/your-repo/your-project.git](https://github.com/JamJam126/github-clone.git)`
 2. **Install dependencies**: `composer install` and `npm install`
 3. **Create a new database**: Create a new database and update the `.env` file with your database credentials
-4. **Generaet key**: `php artisan key:generate`
+4. **Generate key**: `php artisan key:generate`
 5. **Run migrations**: `php artisan migrate`
 6. **Run the development server**: `php artisan serve`
 7. **Run the frontend development server**: `npm run dev`
