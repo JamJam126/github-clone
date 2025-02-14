@@ -1,9 +1,10 @@
 <template>
     <div v-if="type == 'folder'"
-        class="h-8 flex"
+        class="h-8 flex cursor-pointer"
         @click="handleExpandClose(index)">
         <svg v-if="type === 'folder'"
-            class="h-6 w-7"
+            class='h-6 w-7'
+            v-bind:style= "[array[index] === 1 ? 'transform: rotate(90deg);' : '']"
             xmlns="http://www.w3.org/2000/svg"
             width="12" height="12" 
             viewBox="0 0 24 24"
@@ -14,7 +15,7 @@
         </svg>
 
         <div v-if="type === 'folder'"
-            class="h-8 flex gap-1.5"
+            class="h-8 flex gap-1.5 overflow-hidden"
 
             >
             <svg xmlns="http://www.w3.org/2000/svg" 
@@ -30,16 +31,58 @@
             {{ name }}</div
         >
     </div>
-
     <ul v-if="array[index] === 1"
         class="px-4">
+        <div v-if="loading" 
+            class="-mt-2 ml-4 mb-1 flex gap-1 py-1">
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24">
+                <g fill="none" 
+                    stroke="currentColor" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    stroke-width="2">
+                    <path stroke-dasharray="16" 
+                        stroke-dashoffset="16" 
+                        d="M12 3c4.97 0 9 4.03 9 9">
+                        <animate fill="freeze" 
+                                attributeName="stroke-dashoffset" 
+                                dur="0.3s" 
+                                values="16;0"
+                        />
+                        <animateTransform attributeName="transform" 
+                                        dur="1.5s" 
+                                        repeatCount="indefinite" 
+                                        type="rotate" 
+                                        values="0 12 12;360 12 12"
+                        />
+                    </path>
+                    <path stroke-dasharray="64" 
+                            stroke-dashoffset="64" 
+                            stroke-opacity="0.3" 
+                            d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z"
+                            >
+                        <animate fill="freeze" 
+                                attributeName="stroke-dashoffset" 
+                                dur="1.2s" 
+                                values="64;0"
+                        />
+                    </path>
+                </g>
+            </svg>
+            <p>Loading</p>
+        </div>
         <li v-for="(item, index) in folderTree" 
             :key="item.id"
             class="flex flex-col">
             <Folder :name="item.name" 
                     :type="item.type"
+                    :repo_name="repo_name"
                     :index="index"
-                    :array="array"
+                    :file_id="item.id"
+                    :array="currArray"
                     @handle-expansion="handleFolderExpansion"
             />
             <!-- <p>
@@ -50,7 +93,7 @@
 
 
     <div v-if="type === 'file'"
-        class="h-8 ml-7 flex gap-1.5"
+        class="h-8 ml-7 flex gap-1.5 over"
         >
         <svg xmlns="http://www.w3.org/2000/svg" 
             width="24" 
@@ -62,67 +105,62 @@
                     d="M19 19H8q-.825 0-1.412-.587T6 17V3q0-.825.588-1.412T8 1h6.175q.4 0 .763.15t.637.425l4.85 4.85q.275.275.425.638t.15.762V17q0 .825-.587 1.413T19 19m0-11h-3.5q-.625 0-1.062-.437T14 6.5V3H8v14h11zM4 23q-.825 0-1.412-.587T2 21V8q0-.425.288-.712T3 7t.713.288T4 8v13h10q.425 0 .713.288T15 22t-.288.713T14 23zM8 3v5zv14z"
                     />
         </svg>
-        <p>{{ name }}</p>
-        </div
-    >
+        <p class="overflow-hidden">{{ name }}</p>
+    </div>
 </template>
 
 <script setup>
 
-    import { defineProps, defineEmits, ref } from 'vue';
+    import { transform } from 'typescript';
+    import { defineProps, defineEmits, ref, watch } from 'vue';
 
     const props = defineProps ({
         name: String, 
-
         type: String,
-
         index: Number,
-
+        repo_name: String,
+        file_id: String,
         array: Array,
     })
 
     const folderTree = ref([])
-
+    const currArray = ref([])
+    const loading = ref([false])
     const emit = defineEmits(['handle-expansion'])
 
-    const repo = 'My-First-Repo';
-    const folder = props.name;
+    const repo = props.repo_name
+    const folder = props.name
 
-    const Test = (index) => {
-        console.log(index.value)
-    }
-    
-    
     const fetchData = async () => {
-        const url = `/fileTree/${repo}/${folder}`; // Example URL
+        const url = `/fileTree/${repo}/${folder}/${props.file_id}`
         try {
-            const response = await fetch(url);
+            const response = await fetch(url)
             
-            const data = await response.json();
-            console.log('Response Data:', data);
-            folderTree.value = data[0];
-           
+            const data = await response.json()
+            console.log('Response Data:', data)
+            folderTree.value = data[0]
+            loading.value = false
+            currArray.value = Array(data[0].length).fill(0)
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Network response was not ok')
             }
 
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error)
         }
     };
     
     const handleExpandClose = async (index) => {
         emit('handle-expansion', index)
         if (!folderTree.value || folderTree.value.length === 0) {
+            loading.value = true
             await fetchData();
         }
-       // Test(index)
-       
-        // console.log(folderTree.value)
-        console.log(index)
-        // const testArray = folderTree.value.Array
-        // console.log(testArray)
+        console.log(folderTree.value)
     }
 
+    const handleFolderExpansion = (index) => {
+        currArray.value[index] = currArray.value[index] === 0 ? 1 : 0
+    }
     
 </script>

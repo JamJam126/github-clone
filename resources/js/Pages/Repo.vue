@@ -58,7 +58,7 @@
                                             :href="route('repo.folderhandle', {
                                                 user: repo_owner,
                                                 repo: info.name,
-                                                path: folder.name })"
+                                                 path: folder.name })"
                                             >
                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                 width="24"

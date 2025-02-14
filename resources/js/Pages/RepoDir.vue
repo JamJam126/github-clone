@@ -10,6 +10,8 @@
                         class="flex flex-col">
                         <Folder :name="item.name" 
                                 :type="item.type"
+                                :repo_name="repo.name"
+                                :file_id="item.id"
                                 :index="index"
                                 :array="array"
                                 @handle-expansion="handleFolderExpansion"
@@ -46,7 +48,7 @@
                                     <Link class="flex gap-2" :href="route('repo.folderhandle', {
                                         user: repo_owner,
                                         repo: repo.name,
-                                        path: `${currFolder}/${folder.name}`,
+                                        path: `${currPath}/${folder.name}`,
                                     })">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         class="text-[#9198a1]">
@@ -62,9 +64,8 @@
                                     class="h-10 content-center border-t border-t-zinc-700 pl-4">
                                     <Link class="flex gap-2" :href="route('repo.filehandler', {
                                         user: repo_owner,
-
                                         repo: repo.name,
-                                        path: `${currFolder}/${file.name}`,
+                                        path: `${currPath}/${file.name}`,
 
                                     })">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -98,15 +99,12 @@
 const props = defineProps({
 
     repo: Object,
-
     files: Array,
-
     folders: Array,
-
     currFolder: Object,
-
     repo_tree: Array,
-    repo_owner: String
+    repo_owner: String,
+    currPath: String,
 
     // repo_folders: Array,
 
@@ -120,7 +118,7 @@ const props = defineProps({
     }
 
     const array = ref(Array(props.repo_tree.length).fill(0))
-    
+
     const handleFolderExpansion = (index) => {
         array.value[index] = array.value[index] === 0 ? 1 : 0
     };
