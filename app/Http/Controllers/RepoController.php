@@ -206,19 +206,21 @@ class RepoController extends Controller
         $filesArray = $files->toArray();
         $foldersArray = $folders->toArray();
         $repoFoldersFilesTree = array_merge($foldersArray, $filesArray);
+        // It does not take null as parent id because if the parent id is Null is it parent
+        // so we retrieve the the first parent id
         for ($i = 0; $i < sizeof($pathArray); $i++) {
-
             $searchFolder =
-                Folder::select('id', 'name', 'parent_id')
-                ->where('repo_id', $checkRepo->id)
-                ->where('parent_id', $parentFolderId)
-                ->where('name', $pathArray[$i])
-                ->first();
+            Folder::select('id', 'name', 'parent_id')
+            ->where('repo_id', $checkRepo->id)
+            ->where('parent_id', $parentFolderId)
+            ->where('name', $pathArray[$i])
+            ->first();
             if ($searchFolder) {
                 $parentFolderId = $searchFolder->id;
             }
         }
 
+        // dd($parentFolderId);
         $files = File::where('folder_id',  $parentFolderId)->get();
         // dd($files);
         $subfolders = Folder::where('parent_id', $parentFolderId)->where('repo_id', $checkRepo->id)->get();
@@ -231,7 +233,7 @@ class RepoController extends Controller
             'repo_tree' => $repoFoldersFilesTree,
             'files' => $files,
             'folders' => $subfolders,
-            'currFolder' => $pathArray[sizeof($pathArray) -1],
+            'currFolder' => $path,
         ]);
     }
     public function fileHandler($user, $repoName, $path) {}

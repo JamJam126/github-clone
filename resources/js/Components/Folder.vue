@@ -17,8 +17,8 @@
 
     <ul v-if="array[index] === 1" class="px-4">
         <li v-for="(item, index) in folderTree" :key="item.id" class="flex flex-col">
-            <Folder :name="item.name" :type="item.type" :index="index" :array="array" :file_id="item.id" :repo_name="repo"
-                @handle-expansion="handleFolderExpansion" />
+            <Folder :name="item.name" :type="item.type" :index="index" :array="array" :file_id="item.id"
+                :repo_name="repo" @handle-expansion="handleFolderExpansion" />
             <!-- <p>
                 {{ item.name }}
             </p> -->
@@ -41,12 +41,21 @@
 import { defineProps, defineEmits, ref } from 'vue';
 
 const props = defineProps({
-    name: String,
-    file_id: String,
+    name: {
+        type: String,
+        required: true
+    },
+    file_id: {
+        type: String,
+        required: true
+    },
     type: String,
 
     index: Number,
-    repo_name: String,
+    repo_name: {
+        type: String,
+        required: true
+    },
     array: Array,
 })
 
