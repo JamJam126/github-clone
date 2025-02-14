@@ -28,8 +28,8 @@
                     d="M4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h6l2 2h8q.825 0 1.413.588T22 8v10q0 .825-.587 1.413T20 20z"
                         />
             </svg>
-            {{ name }}</div
-        >
+            {{ name }}
+        </div>
     </div>
     <ul v-if="array[index] === 1"
         class="px-4">
@@ -88,7 +88,7 @@
             <!-- <p>
                 {{ item.name }}
             </p> -->
-        </li> 
+        </li>
     </ul>
 
 
@@ -111,17 +111,26 @@
 
 <script setup>
 
-    import { transform } from 'typescript';
-    import { defineProps, defineEmits, ref, watch } from 'vue';
+import { defineProps, defineEmits, ref } from 'vue';
 
-    const props = defineProps ({
-        name: String, 
+const props = defineProps({
+    name: {
         type: String,
-        index: Number,
-        repo_name: String,
-        file_id: String,
-        array: Array,
-    })
+        required: true
+    },
+    file_id: {
+        type: String,
+        required: true
+    },
+    type: String,
+
+    index: Number,
+    repo_name: {
+        type: String,
+        required: true
+    },
+    array: Array,
+})
 
     const folderTree = ref([])
     const currArray = ref([])

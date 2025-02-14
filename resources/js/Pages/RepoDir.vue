@@ -5,18 +5,20 @@
                 <!-- <SubFolders :folder_tree="repo_tree" /> -->
                 <ul v-if="repo_tree"
                     class="px-4 mt-4">
-                    <li v-for="(item, index) in repo_tree" 
+                    <li v-for="(item, index) in repo_tree"
                         :key="item.id"
                         class="flex flex-col">
-                        <Folder :name="item.name" 
+                        <Folder :name="item.name"
                                 :type="item.type"
                                 :repo_name="repo.name"
                                 :file_id="item.id"
                                 :index="index"
                                 :array="array"
+                                :repo_name="repo.name"
+                                :file_id="item.id"
                                 @handle-expansion="handleFolderExpansion"
                         />
-                    </li> 
+                    </li>
                 </ul>
             </div>
 
@@ -93,7 +95,6 @@
     import { defineProps, ref } from 'vue';
     import { Link } from '@inertiajs/vue3';
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-    import SubFolders from '@/Components/SubFolders.vue';
     import Folder from '@/Components/Folder.vue';
 
 const props = defineProps({
@@ -110,6 +111,7 @@ const props = defineProps({
 
     // repo_files: Array,
 })
+
 
     const Test = (index) => {
 

@@ -194,14 +194,13 @@ class RepoController extends Controller
                     });
 
         $folders = Folder::select('id', 'name')
-                        ->where('repo_id', $checkRepo->id)
-                        // ->where('parent_id', $parentFolderId)
-                        ->whereNull('parent_id')
-                        ->get()
-                        ->map(function ($folder) {
-                            $folder->type = 'folder';
-                            return $folder;
-                        });
+            ->where('repo_id', $checkRepo->id)
+            ->where('parent_id', $parentFolderId)
+            ->get()
+            ->map(function ($folder) {
+                $folder->type = 'folder';
+                return $folder;
+            });
 
         $filesArray = $files->toArray();
         $foldersArray = $folders->toArray();
@@ -235,6 +234,7 @@ class RepoController extends Controller
 
         }
 
+        // dd($parentFolderId);
         $files = File::where('folder_id',  $parentFolderId)->get();
         $subfolders = Folder::where('parent_id', $parentFolderId)
                             ->where('repo_id', $checkRepo->id)
@@ -248,69 +248,69 @@ class RepoController extends Controller
             'repo_tree' => $repoFoldersFilesTree,
             'files' => $files,
             'folders' => $subfolders,
-            'currFolder' => end($pathArray),
-            'currPath' => $path,
+            'currFolder' => $path,
         ]);
     }
 
-    public function fileHandler($user, $repoName, $path) {
-        $checkRepo = Repo::select()->where("name", $repoName)->get();
-        $checkRepo = $checkRepo[0];
-        if ($checkRepo->visibility == "private" && Auth::id() !== $checkRepo->user_id) {
-            abort(404);
-        }
 
-        // Show the file base on the path that will be list in $path
-        $pathArray = explode('/', $path);
-        $parentFolderId = null;
+        public function fileHandler($user, $repoName, $path) {
+            $checkRepo = Repo::select()->where("name", $repoName)->get();
+            $checkRepo = $checkRepo[0];
+            if ($checkRepo->visibility == "private" && Auth::id() !== $checkRepo->user_id) {
+                abort(404);
+            }
     
-        foreach ($pathArray as $folderName) {
-
-            $searchFolder = Folder::select('id', 'name', 'parent_id')
-                    ->where('repo_id', $checkRepo->id)
-                    ->where('parent_id', $parentFolderId)
-                    ->where('name', $folderName)
-                    ->first();
-            
-            if ($searchFolder)
-                $parentFolderId = $searchFolder->id;
-
-        }
-
-        $fileContent = File::select('content')
-                            ->where('folder_id', $parentFolderId)
-                            ->where('name', $pathArray[sizeof($pathArray) - 1])
-                            ->value('content');
-
-        $decodedContent = base64_decode($fileContent);
-        // dd($decodedContent);
-        return Inertia::render('DisplayFileContent', [
-            'content' => $decodedContent,
-        ]);
-    }
+            // Show the file base on the path that will be list in $path
+            $pathArray = explode('/', $path);
+            $parentFolderId = null;
+        
+            foreach ($pathArray as $folderName) {
+    
+                $searchFolder = Folder::select('id', 'name', 'parent_id')
+                        ->where('repo_id', $checkRepo->id)
+                        ->where('parent_id', $parentFolderId)
+                        ->where('name', $folderName)
+                        ->first();
+                
+                if ($searchFolder)
+                    $parentFolderId = $searchFolder->id;
+    
+            }
+    
+            $fileContent = File::select('content')
+                                ->where('folder_id', $parentFolderId)
+                                ->where('name', $pathArray[sizeof($pathArray) - 1])
+                                ->value('content');
+    
+            $decodedContent = base64_decode($fileContent);
+            // dd($decodedContent);
+            return Inertia::render('DisplayFileContent', [
+                'content' => $decodedContent,
+            ]);
+    
 
     public function getChildren($repoName, $folderName, $folderId)
     {
-        // $CurrfolderId = Folder::select('id')->where('name', $folderName)->where('repo_id', 1)->value('id');
+        // $repo_id = Repo::select("id")->where('name', $repoName)->value('id');
+
         $repo_id = Repo::select("id")->where('name', $repoName)->value('id');
         $files = File::select('id', 'name')
-                     ->where('folder_id', $folderId)
+                     ->where('folder_id', $CurrfolderId)
                      ->whereNull('repo_id')
                      ->get()
                      ->map(function ($file) {
-                        $file->type = 'file'; 
+                        $file->type = 'file';
                         return $file;
                     });
 
         $folders = Folder::select('id', 'name')
-                         ->where('parent_id', $folderId)
-                         ->where('repo_id', $repo_id)
+                         ->where('parent_id', $CurrfolderId)
                          ->get()
                          ->map(function ($folder) {
                             $folder->type = 'folder';
                             return $folder;
                         });
-        
+
         $filesArray = $files->toArray();
         $foldersArray = $folders->toArray();
         $repoFoldersFilesTree = array_merge($foldersArray, $filesArray);
@@ -318,6 +318,6 @@ class RepoController extends Controller
         return response()->json([$repoFoldersFilesTree]);
 
 
-        
+
     }
 }
