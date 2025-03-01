@@ -183,7 +183,7 @@ import TextInput from "@/Components/TextInput.vue";
 const form = useForm({
     name: "",
     description: "",
-    visibility: "",
+    visibility: "Public",
 });
 
 const successMessage = ref("");
