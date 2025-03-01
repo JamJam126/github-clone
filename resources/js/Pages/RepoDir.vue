@@ -5,8 +5,15 @@
                 <!-- <SubFolders :folder_tree="repo_tree" /> -->
                 <ul v-if="repo_tree" class="px-4 mt-4">
                     <li v-for="(item, index) in repo_tree" :key="item.id" class="flex flex-col">
-                        <Folder :name="item.name" :type="item.type" :repo_name="repo.name" :file_id="item.id"
-                            :index="index" :array="array" @handle-expansion="handleFolderExpansion" />
+                        <Folder :repo_owner="repo_owner"
+                                :name="item.name" 
+                                :type="item.type" 
+                                :repo_name="repo.name" 
+                                :file_id="item.id"
+                                :index="index" 
+                                :array="array" 
+                                :folderPath="currPath"
+                                @handle-expansion="handleFolderExpansion" />
                     </li>
                 </ul>
             </div>
@@ -108,6 +115,7 @@ const Test = (index) => {
 
 }
 
+const currPath = ref("")
 const array = ref(Array(props.repo_tree.length).fill(0))
 
 const handleFolderExpansion = (index) => {

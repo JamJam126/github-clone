@@ -1,35 +1,43 @@
 <template>
     <div v-if="type == 'folder'"
-        class="h-8 flex cursor-pointer"
-        @click="handleExpandClose(index)">
+        class="h-8 flex cursor-pointer">
         <svg v-if="type === 'folder'"
             class='h-6 w-7'
             v-bind:style= "[array[index] === 1 ? 'transform: rotate(90deg);' : '']"
             xmlns="http://www.w3.org/2000/svg"
             width="12" height="12" 
             viewBox="0 0 24 24"
+            @click="handleExpandClose(index)"
             >
             <path fill="currentColor" 
                     d="M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z"
                     />
         </svg>
 
-        <div v-if="type === 'folder'"
-            class="h-8 flex gap-1.5 overflow-hidden"
-
-            >
-            <svg xmlns="http://www.w3.org/2000/svg" 
-                width="24"
-                height="24" 
-                viewBox="0 0 24 24"
-                class="text-[#9198a1]"
+        
+            <div v-if="type === 'folder'"
+                class="h-8"
+                @click="test">
+                <Link :href="route('repo.folderhandle', {
+                        user: repo_owner,
+                        repo: repo_name,
+                        path: currPath,})"
+                    class="flex gap-1.5 overflow-hidden h-full"
                 >
-                <path fill="currentColor" 
-                    d="M4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h6l2 2h8q.825 0 1.413.588T22 8v10q0 .825-.587 1.413T20 20z"
-                        />
-            </svg>
-            {{ name }}
-        </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                    width="24"
+                    height="24" 
+                    viewBox="0 0 24 24"
+                    class="text-[#9198a1]"
+                    >
+                    <path fill="currentColor" 
+                        d="M4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h6l2 2h8q.825 0 1.413.588T22 8v10q0 .825-.587 1.413T20 20z"
+                            />
+                    </svg>
+                    {{ name }}
+                </Link>
+            
+        </div>        
     </div>
     <ul v-if="array[index] === 1"
         class="px-4">
@@ -77,12 +85,14 @@
         <li v-for="(item, index) in folderTree" 
             :key="item.id"
             class="flex flex-col">
-            <Folder :name="item.name" 
+            <Folder :repo_owner="repo_owner"
+                    :name="item.name" 
                     :type="item.type"
                     :repo_name="repo_name"
                     :index="index"
                     :file_id="item.id"
                     :array="currArray"
+                    :folderPath="currPath"
                     @handle-expansion="handleFolderExpansion"
             />
             <!-- <p>
@@ -90,7 +100,6 @@
             </p> -->
         </li>
     </ul>
-
 
     <div v-if="type === 'file'"
         class="h-8 ml-7 flex gap-1.5 over"
@@ -111,9 +120,11 @@
 
 <script setup>
 
-import { defineProps, defineEmits, ref } from 'vue';
+    import { defineProps, defineEmits, ref, watch } from 'vue';
+    import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
+    repo_owner: String,
     name: {
         type: String,
         required: true
@@ -123,18 +134,21 @@ const props = defineProps({
         required: true
     },
     type: String,
-
     index: Number,
     repo_name: {
         type: String,
         required: true
     },
     array: Array,
+    folderPath: String,
 })
 
     const folderTree = ref([])
     const currArray = ref([])
     const loading = ref([false])
+    const currPath = props.folderPath === '' 
+                    ? ref(props.name) 
+                    : ref(props.folderPath + '/' + props.name)
     const emit = defineEmits(['handle-expansion'])
 
     const repo = props.repo_name
@@ -159,17 +173,33 @@ const props = defineProps({
         }
     };
     
+    const handleFolderExpansion = (index) => {
+        currArray.value[index] = currArray.value[index] === 0 ? 1 : 0
+    }
+    
     const handleExpandClose = async (index) => {
         emit('handle-expansion', index)
         if (!folderTree.value || folderTree.value.length === 0) {
             loading.value = true
             await fetchData();
         }
-        console.log(folderTree.value)
+        if (currArray.value[index] === 1) {
+            closeAllNestedFolders(index)
+        }
     }
 
-    const handleFolderExpansion = (index) => {
-        currArray.value[index] = currArray.value[index] === 0 ? 1 : 0
+    const closeAllNestedFolders = (index) => {
+
+        currArray.value[index] = 0
+        if (folderTree.value[index].children.length > 0) {
+            folderTree.value[index].children.forEach((_, childIndex) => {
+                closeAllNestedFolders(childIndex)
+            })
+        }
     }
-    
+
+    const debugging = () => {
+        console.log(currPath.value)
+    }
+
 </script>
