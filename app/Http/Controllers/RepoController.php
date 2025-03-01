@@ -171,6 +171,7 @@ class RepoController extends Controller
             // 'test' => $file,
         ]);
     }
+
     // This will handle folder and stuff
     public function folderHandler($user, $repoName, $path)
     {
@@ -181,13 +182,23 @@ class RepoController extends Controller
         }
         // Show the file base on the path that will be list in $path
         $pathArray = explode('/', $path);
-
-        $mainFolders = Folder::select('id', 'name')
+        $mainFolders = null;
+        if (sizeof($pathArray) > 1) {
+            $mainFolders = Folder::select('id', 'name')
             ->where('repo_id', $checkRepo->id)
             ->whereNull('parent_id')
             ->first();
+        } else {
+            $mainFolders = Folder::select('id', 'name')
+            ->where('repo_id', $checkRepo->id)
+            ->whereNull('parent_id')
+            ->where('name', $pathArray[0])
+            ->first();
+        }
+            
         $parentFolderId = $mainFolders->id;
         $searchFolder = NULL;
+
         $files = File::select('id', 'name')
             ->where('repo_id', $checkRepo->id)
             ->whereNull('folder_id')
@@ -196,18 +207,21 @@ class RepoController extends Controller
                 $file->type = 'file';
                 return $file;
             });
+
         $folders = Folder::select('id', 'name')
             ->where('repo_id', $checkRepo->id)
-            ->where('parent_id', $parentFolderId)
+            ->whereNull('parent_id')
             ->get()
             ->map(function ($folder) {
                 $folder->type = 'folder';
                 return $folder;
             });
 
+            
         $filesArray = $files->toArray();
         $foldersArray = $folders->toArray();
         $repoFoldersFilesTree = array_merge($foldersArray, $filesArray);
+
         // It does not take null as parent id because if the parent id is Null is it parent
         // so we retrieve the the first parent id
         for ($i = 0; $i < sizeof($pathArray); $i++) {
@@ -222,7 +236,7 @@ class RepoController extends Controller
             }
         }
 
-        // dd($parentFolderId);
+        // dd($pathArray[1]);
         $files = File::where('folder_id',  $parentFolderId)->get();
         // dd($files);
         $subfolders = Folder::where('parent_id', $parentFolderId)->where('repo_id', $checkRepo->id)->get();
