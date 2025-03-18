@@ -71,6 +71,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/store/repository', [RepoController::class, 'store'])->name('repos.store');
     Route::post('/{user}/{repo}', [CommitController::class, 'store'])->name('files.commit');
     Route::post('/commited-files', [FileController::class, 'store'])->name('commited.files');
+
+    // {star} is boolean of user stars or unstars the repo 
+    Route::get('/star/{star}/{user}/{repo}', [RepoController::class, 'handleStar']);
+
+    Route::get('/pin/{pin}/{user}/{repo}', [RepoController::class, 'handlePin']);
 });
 
 

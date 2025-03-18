@@ -6,7 +6,7 @@
     >
         <Navigation />
 
-        <main className="flex-grow text-white flex">
+        <main className="flex-grow text-white flex ">
 
             <slot></slot>
         </main>

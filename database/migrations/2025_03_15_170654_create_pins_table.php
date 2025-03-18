@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('files', function (Blueprint $table) {
-            $table->dropForeign(['commit_id']);
-            $table->dropForeign(['repo_id']); 
-            
-            $table->dropColumn(['commit_id', 'repo_id']);
+        Schema::create('pins', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('repo_id')->constrained('repos')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
@@ -24,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('files', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('pins');
     }
 };

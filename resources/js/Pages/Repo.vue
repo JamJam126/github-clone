@@ -1,21 +1,34 @@
 <template>
     <AuthenticatedLayout>
-
-        <div class="w-full bg-gray-950"> <!-- Github Color-> bg-[#0D1117] -->
+        
+        <div class="w-full bg-gray-950 "> <!-- Github Color-> bg-[#0D1117] -->
+            
+            <RepoNav />
+            
             <div class="flex flex-col w-[1280px] mx-auto">
 
-                <!-- Repo Name -->
-                <div class="h-16 w-full border-b flex items-center
+                <div class="h-16 w-full border-b flex justify-between items-center
                          border-b-zinc-700 gap-2">
 
-                    <h1 class="font-semibold text-xl">
-                        {{ info.name }}</h1
-                    >
+                    <div class="h-full w-full flex items-center gap-2">
 
-                    <div class="font-medium text-xs text-gray-500 border
-                                border-zinc-700 rounded-xl px-[6px] pb-[2px]">
-                        {{ info.visibility }}</div
-                    >
+                        <!-- Repo Name -->
+                        <h1 class="font-semibold text-xl">
+                            {{ info.name }}</h1
+                        >
+
+                        <div class="font-medium text-xs text-gray-500 border
+                                    border-zinc-700 rounded-xl px-[6px] pb-[2px]">
+                            {{ info.visibility }}</div
+                        >
+                    
+                    </div>
+
+                    <ButtonsContainer :total_stars="info.total_stars" 
+                                      :info="info" 
+                                      :star="star"
+                                      :pin="pin"
+                    />
 
                 </div>
 
@@ -41,7 +54,7 @@
                             class="w-full h-auto border border-zinc-700 rounded-lg">
                             <!--Total and Lastest Commits  -->
                             <div class="h-[52px] bg-[#151b23] rounded-t-lg">
-
+                                
                             </div>
 
                             <!-- Files and Folders -->
@@ -110,8 +123,11 @@
                         </div>
                     </div>
 
-                    <div class="h-full w-[300px]">
-
+                    <div class="h-full w-[300px] mt-2 ml-6">
+                        <div class="py-4">
+                            <p class="font-semibold ">About</p>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -125,24 +141,37 @@
 <script setup>
 
     import { useForm, Link } from '@inertiajs/vue3';
-    import { defineProps, ref } from 'vue';
+    import { defineProps, onMounted, ref } from 'vue';
+    import RepoNav from '@/Components/RepoNav.vue';
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
     import PrimaryButton from '@/Components/PrimaryButton.vue';
     import CommitModal from '@/Pages/CommitModal.vue';
+    import ButtonsContainer from '@/Components/ButtonsContainer.vue';
 
 const props = defineProps({
     info: Object,
     repo_owner: String,
     files: Array,
-
     folders: Array,
-
+    star: Boolean,
+    pin: Boolean,
 });
+
+const navigationLink = ref([]);
 
 const openModal = ref(false);
 
 const showTestModal = () => {
     openModal.value = !openModal.value;
+}
+
+const handleStar = async (newStarStatus) => {
+
+    console.log(newStarStatus)
+    // const response = await fetch(`/star/${newStarStatus}/${props.info.user_name}/${props.info.id}`);
+    // const data = await response.json()
+    // console.log(data)
+
 }
 
 const handleCommit = (files) => {
@@ -163,5 +192,9 @@ const handleCommit = (files) => {
 
     };
 }
+
+// onMounted (() => {
+//     navigationLink.push(props.info.name)
+// })
 
 </script>

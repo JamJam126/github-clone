@@ -1,14 +1,18 @@
 
 
 <template>
-    <nav class="h-16 flex pl-2 items-center border-b gap-10">
+    <nav class="h-16 flex px-2 items-center gap-10 justify-between">
         <Link href="/home" class="flex flex-row items-center gap-4">
             <ApplicationLogo class="h-[60px] w-[60px] fill-current text-gray-500"/>
             LaraHub
         </Link>
             
 
-        <Search />
+        <!-- For changes in the future  -->
+        <div class="pr-40">
+            <Search />
+        </div>
+        
         
     </nav>
 

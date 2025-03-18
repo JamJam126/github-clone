@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('commit_id')->constrained('commits')->onDelete('cascade');
-            $table->foreignId('repo_id')->constrained('repos')->onDelete('cascade');
+            $table->foreignId('folder_id')->nullable()->constrained('folders')->onDelete('cascade');
+            $table->foreignId('repo_id')->nullable()->constrained('repos')->onDelete('cascade');
             $table->foreignId('previous_version_id')->nullable()->constrained('files')->onDelete('set null');
             $table->integer('file_size');
             $table->string('file_path');
             $table->boolean('is_latest')->default(true);
+            $table->text('content')->nullable();
             $table->timestamps();
         });
     }

@@ -6,6 +6,8 @@ use App\Models\Repo;
 use App\Models\User;
 use App\Models\File;
 use App\Models\Folder;
+use App\Models\Star;
+use App\Models\Pin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -59,11 +61,14 @@ class RepoController extends Controller
     public function repo($user, $repo)
     {
 
-        $info = Repo::select('repos.name', 'repos.id', 'repos.created_at', 'repos.visibility', 'users.name as user_name')
-            ->join('users', 'repos.user_id', '=', 'users.id')
-            ->where('users.name', $user)
-            ->where('repos.name', $repo)
-            ->first();
+        $info = Repo::select('repos.name', 'repos.id', 'repos.created_at', 'repos.visibility', 'repos.total_stars', 'users.name as user_name')
+                    ->join('users', 'repos.user_id', '=', 'users.id')
+                    ->where('users.name', $user)
+                    ->where('repos.name', $repo)
+                    ->first();
+
+        $isStarred = Star::where('user_id', Auth::id())->where('repo_id', $info->id)->first();
+        $isPinned = Pin::where('user_id', Auth::id())->where('repo_id', $info->id)->first();
 
         if (!$info) return abort(404, 'Repository not found');
         $file = File::where('repo_id',  $info->id)->whereNull('folder_id')->get();
@@ -74,7 +79,9 @@ class RepoController extends Controller
             'info' => $info,
             'files' => $file,
             'folders' => $folder,
-            'repo_owner' => $user
+            'star' => $isStarred,
+            'pin' => $isPinned,
+            'repo_owner' => $user // THIS ONE IS DUP, SHOULD BE REMOVED
         ]);
     }
 
@@ -83,7 +90,7 @@ class RepoController extends Controller
 
         $repo = Repo::where('name', $repoName)->first();
         $repo_owner = $repo->user->name;
-        dd($repo_owner);
+        // dd($repo_owner);
         $files = File::select('id', 'name')
             ->where('repo_id', $repo->id)
             ->get()
@@ -91,6 +98,7 @@ class RepoController extends Controller
                 $file->type = 'file';
                 return $file;
             });
+            
         $folders = Folder::select('id', 'name')
             ->where('repo_id', $repo->id)
             ->whereNull('parent_id')
@@ -103,7 +111,7 @@ class RepoController extends Controller
         $filesArray = $files->toArray();
         $foldersArray = $folders->toArray();
         $repoFoldersFilesTree = array_merge($foldersArray, $filesArray);
-        // dd($repoFoldersFilesTree);
+        dd($repoFoldersFilesTree);
 
         $folder = Folder::where('name', $folderName)->first();
 
@@ -111,7 +119,7 @@ class RepoController extends Controller
 
         $subfolders = Folder::where('parent_id', $folder->id)->get();
 
-
+        dd($folderName);
         // dd($test->id);
 
         return Inertia::render('RepoDir', [
@@ -126,16 +134,7 @@ class RepoController extends Controller
 
     public function displayRootFileContent($user, $repoName, $file)
     {
-        // $fileNameCheck = File::where('name', $file)->exists();
-        // dd($fileNameCheck);
 
-        // $repoIdCheck = File::where('repo_id', $repoId)->exists();
-        // dd($repoIdCheck);
-
-        // $folderIdCheck = File::whereNull('folder_id')->exists();
-        // dd($folderIdCheck);
-
-        // $repo = Repo::where('name', $repoName)->first();
         $repoId = Repo::select('id')->where('name', $repoName)->value('id');
 
         $fileContent = File::select('content')
@@ -183,7 +182,7 @@ class RepoController extends Controller
         // Show the file base on the path that will be list in $path
         $pathArray = explode('/', $path);
         $mainFolders = null;
-        if (sizeof($pathArray) > 1) {
+        if (sizeof($pathArray) < 1) {
             $mainFolders = Folder::select('id', 'name')
             ->where('repo_id', $checkRepo->id)
             ->whereNull('parent_id')
@@ -216,7 +215,7 @@ class RepoController extends Controller
                 $folder->type = 'folder';
                 return $folder;
             });
-
+        
             
         $filesArray = $files->toArray();
         $foldersArray = $folders->toArray();
@@ -240,8 +239,9 @@ class RepoController extends Controller
         $files = File::where('folder_id',  $parentFolderId)->get();
         // dd($files);
         $subfolders = Folder::where('parent_id', $parentFolderId)->where('repo_id', $checkRepo->id)->get();
-
+        // dd($parentFolderId);
         // dd($test->id);
+        // dd($path);
 
         return Inertia::render('RepoDir', [
             'repo_owner' => $user,
@@ -317,5 +317,80 @@ class RepoController extends Controller
         $repoFoldersFilesTree = array_merge($foldersArray, $filesArray);
 
         return response()->json([$repoFoldersFilesTree]);
+    }
+
+    public function handleStar($star, $user, $repoId)
+    {
+        // $starStatus = $request->input('star');
+        
+
+        $userId = User::select('id')->where('name', $user)->value('id');
+        $text = ""; // FOR DEBUGGING    
+        $starStatus = filter_var($star, FILTER_VALIDATE_BOOLEAN); // THIS WILL CONVERT TO BOOLEAN
+
+        if ($starStatus === true) 
+        {
+            $star = new Star();
+            $star->user_id = $userId;
+            $star->repo_id = $repoId;
+            $star->save();
+
+            Repo::find($repoId)->increment('total_stars');
+
+            $text = "Starred";
+        }
+
+        else if ($starStatus === false)
+        {
+            Star::where('user_id', $userId)
+                ->where('repo_id', $repoId)
+                ->delete();
+
+            Repo::find($repoId)->decrement('total_stars');
+            $text = "Unstarred";
+        }
+
+        return response()->json([
+            "userId" => $repoId,
+            "repoId" => $repoId,
+            "starStatus" => $text
+        ]);
+
+        // return Inertia::render('ButtonsContainer', [
+        //     'star' => $star, 
+        // ]);
+    }
+
+    public function handlePin($pin, $user, $repoId)
+    {
+        
+        $userId = User::select('id')->where('name', $user)->value('id');
+        $text = ""; // FOR DEBUGGING    
+        $pinStatus = filter_var($pin, FILTER_VALIDATE_BOOLEAN); // THIS WILL CONVERT TO BOOLEAN
+
+        if ($pinStatus === true) 
+        {
+            $pin = new Pin();
+            $pin->user_id = $userId;
+            $pin->repo_id = $repoId;
+            $pin->save();
+
+            $text = "Unpin";
+        }
+
+        else if ($pinStatus === false)
+        {
+            Pin::where('user_id', $userId)
+                ->where('repo_id', $repoId)
+                ->delete();
+
+            $text = "Pin";
+        }
+
+        return response()->json([
+            "userId" => $repoId,
+            "repoId" => $repoId,
+            "pinStatus" => $text
+        ]);
     }
 }
