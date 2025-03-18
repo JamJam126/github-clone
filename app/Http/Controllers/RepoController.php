@@ -47,7 +47,7 @@ class RepoController extends Controller
         $repo = new Repo();
         $repo->name = $request->input('name');
         $repo->description = $request->input('description');
-        $repo->visibility = $request->input('visibility');
+        $repo->visibility = strtolower($request->input('visibility'));
         $repo->user_id = Auth::id();
         $repo->save();
 
@@ -297,7 +297,7 @@ class RepoController extends Controller
         $repo_id = Repo::select("id")->where('name', $repoName)->value('id');
         $files = File::select('id', 'name')
             ->where('folder_id', $folderId)
-            ->whereNull('repo_id')
+            ->where('repo_id', $repo_id)
             ->get()
             ->map(function ($file) {
                 $file->type = 'file';
