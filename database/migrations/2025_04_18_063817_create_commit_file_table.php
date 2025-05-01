@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('commit_files', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('folder_id')->nullable()->constrained('folders')->onDelete('cascade');
-            $table->foreignId('repo_id')->nullable()->constrained('repos')->onDelete('cascade');    
-            $table->integer('file_size');
-            $table->string('file_path');
+            $table->foreignId('commit_id')->constrained('commits');
+            $table->foreignId('file_id')->constrained('files');
+            $table->foreignId('content_id')->constrained('contents');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropIfExists('commit_file');
     }
 };

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
+use App\Models\Content;
 use App\Models\Commit;
 use App\Models\Repo;
 use App\Models\Folder;
@@ -16,6 +18,45 @@ use function Laravel\Prompts\select;
 class CommitController extends Controller
 {
     //
+    private function createContent($fileId, $base64Content, $prevId = null)
+    {
+        return Content::create([
+            'file_id' => $fileId,
+            'content' => $base64Content,
+            'prev_id' => $prevId,
+            'is_lastest' => 1
+        ]);
+    }
+
+    private function getOrCreateFolderPath($segments, $repoId)
+    {
+        $parent = null;
+
+        foreach ($segments as $segment) {
+            $folder = Folder::where('name', $segment)
+                            ->where('repo_id', $repoId)
+                            ->where('parent_id', $parent)
+                            ->first();
+
+            if (!$folder) {
+                $folder = Folder::create([
+                    'repo_id' => $repoId,
+                    'name' => $segment,
+                    'parent_id' => $parent
+                ]);
+            }
+
+            $parent = $folder->id;
+        }
+
+        return $parent;
+    }
+
+    private function getEncodedFileContent($file)
+    {
+        return base64_encode(file_get_contents($file->getRealPath()));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -28,66 +69,94 @@ class CommitController extends Controller
         $files = $request->file('files');
         $paths = $request->input('relativePath');
 
+        $commitMessage = $request->input('message');
+        // dd($commitMessage);
+        $commit = null;
         $test = [];
 
         foreach ($files as $index => $file) {
-            # code...
-            $bomb = explode('/', $paths[$index]);
-            $parent = null;
-            $curr = 0;
+            $pathParts = explode('/', $paths[$index]);
+            $fileName = end($pathParts);
+            $folderSegments = array_slice($pathParts, 0, -1);
+    
+            $parent = count($folderSegments) > 0
+                ? $this->getOrCreateFolderPath($folderSegments, $repo)
+                : null;
+    
 
-            if (sizeof($bomb) > 2) {
-
-                while ($curr < count($bomb) -1) {
-                    $folder = Folder::where('name', $bomb[$curr])
-                                    ->where('repo_id', $repo)
-                                    ->where('parent_id', $parent)
-                                    ->first();
-
-                    if (!$folder) {
-
-                        $newFolder = new Folder();
-                        $newFolder->repo_id = $repo;
-                        $newFolder->name = $bomb[$curr];
-                        $newFolder->parent_id = $parent;
-                        $newFolder->save();
-
-                        $folder = $newFolder;
-                    }
-
-                    $parent = $folder->id;
-                    $curr++;
-                }
-            }
-
-            $existingFile = File::select()
-                                ->where('name', $bomb[count($bomb) - 1])
+            $existingFile = File::where('name', $fileName)
                                 ->where('file_path', $paths[$index])
                                 ->where('repo_id', $repo)
                                 ->first();
+    
+            $base64Content = $this->getEncodedFileContent($file);
+            $hash = hash('sha256', $base64Content);
+    
+            if ($existingFile) 
+            {
+                $existingContent = Content::where('file_id', $existingFile->id)
+                                          ->where('is_latest', 1)
+                                          ->first();
+    
+                // Hash for comparing because it's faster than comparing base64 string
+                if ($existingContent && hash('sha256', $existingContent->content) === $hash) 
+                    continue; // Skip if no changes
 
-            if (!$existingFile) {
+                if ($existingContent) 
+                {
+                    $existingContent->is_latest = 0;
+                    $existingContent->save();
+                }
+    
+                $newContent = $this->createContent($existingFile->id, $base64Content, $existingContent?->id);
+                
+                if(!$commit)
+                {
+                    $commit = Commit::create([
+                        'repo_id' => $repo,
+                        'user_id' => Auth::id(),
+                        'message' => $commitMessage,
+                    ]);
+                }
 
-                $content = file_get_contents($file->getRealPath());
-                $base64Content = base64_encode($content);
+                DB::table('commit_files')->insert([
+                    'commit_id' => $commit->id,
+                    'file_id' => $existingFile->id,
+                    'content_id' => $newContent->id,
+                ]);
+            } 
+            else 
+            {
+                $newFile = File::create([
+                    'name' => $file->getClientOriginalName(),
+                    'file_size' => $file->getSize(),
+                    'file_path' => $paths[$index],
+                    'repo_id' => $repo,
+                    'folder_id' => $parent,
+                ]);
+    
+                $newContent = $this->createContent($newFile->id, $base64Content);
+            
+                if (!$commit)
+                {
+                    $commit = Commit::create([
+                        'repo_id' => $repo,
+                        'user_id' => Auth::id(),
+                        'message' => $commitMessage,
+                    ]);
+                }
 
-                $newFile = new File();
-                $newFile->name = $file->getClientOriginalName();
-                $newFile->content = $base64Content;
-                $newFile->file_size = $file->getSize();
-                $newFile->file_path = $paths[$index];
-                $newFile->repo_id = $repo ;
-                $newFile->folder_id = (count($bomb) <= 2) ? null : $parent;
-
-                $newFile->save();
+                DB::table('commit_files')->insert([
+                    'commit_id' => $commit->id,
+                    'file_id' => $newFile->id,
+                    'content_id' => $newContent->id,
+                ]);
             }
         }
 
         $responseData = [
-
             'files' => $test
         ];
-
 
         return Inertia::render('Repo', ['info' => $responseData]);
 

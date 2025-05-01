@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
 
-        <div class="w-full border-t border-t-[#3d444d] h-auto flex">
+        <div class="w-full h-auto flex">
             <!-- Side Bar -->
             <div class="main-side border-r h-full flex flex-col px-6 pt-4">
                 <div class="mt-8" v-if="repos.length === 0">

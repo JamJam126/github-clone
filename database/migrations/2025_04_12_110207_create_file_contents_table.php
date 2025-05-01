@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('commit_files', function (Blueprint $table) {
+        Schema::create('contents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('file_id')->constrained('files')->onDelete('cascade');
+            $table->foreignId('prev_id')->nullable()->constrained('contents');
+            $table->text('content')->nullable();
+            $table->boolean('is_latest')->default(true);
             $table->timestamps();
         });
     }
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('commit_files');
+        Schema::dropIfExists('file_contents');
     }
 };

@@ -66,15 +66,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/{user}/{repo}/{file}', [RepoController::class, 'displayRootFileContent'])->name('repo.filecontent');
     Route::get('/{user}/{repo}/tree/{path}',[RepoController::class, "folderHandler"])->where('path', '.*')->name("repo.folderhandle");
     Route::get("/{user}/{repo}/blob/{path}", [RepoController::class, "fileHandler"])->where('path', '.*')->name("repo.filehandler");
+    Route::get('/{user}/{repo}/commits/{path}',[RepoController::class, "commitHandler"])->where('path', '.*')->name("repo.commithandle");
+    Route::get('/{user}/{repo}/commit/{commit}/{path}',[RepoController::class, "commitView"])->where('path', '.*')->name("repo.commit.view");
     Route::get('/new', [RepoController::class, 'createRepo'])->name('new');
     Route::get('/home', [RepoController::class, 'getRepo'])->name('repos');
+
     Route::post('/store/repository', [RepoController::class, 'store'])->name('repos.store');
     Route::post('/{user}/{repo}', [CommitController::class, 'store'])->name('files.commit');
     Route::post('/commited-files', [FileController::class, 'store'])->name('commited.files');
 
     // {star} is boolean of user stars or unstars the repo 
     Route::get('/star/{star}/{user}/{repo}', [RepoController::class, 'handleStar']);
-
     Route::get('/pin/{pin}/{user}/{repo}', [RepoController::class, 'handlePin']);
 });
 

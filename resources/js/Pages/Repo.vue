@@ -1,5 +1,5 @@
 <template>
-    <AuthenticatedLayout>
+    <AuthenticatedLayout :hideDefaultNav="true">
         
         <div class="w-full bg-gray-950 "> <!-- Github Color-> bg-[#0D1117] -->
             
@@ -185,10 +185,6 @@ const handleCommit = (files) => {
         form.post(route("commited.files"));
 
         console.log(props.info.test)
-
-        // console.log(index)
-        // console.log(`${file.name}`)
-        // console.log(`${sizeInKB}`)
 
     };
 }

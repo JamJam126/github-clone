@@ -9,11 +9,9 @@ class File extends Model
     //
     protected $fillable = [
         'name', 
-        'previous_version_id',
         'folder_id',
         'file_size',
         'file_path',
-        'is_latest',
         'repo_id',
     ];
 

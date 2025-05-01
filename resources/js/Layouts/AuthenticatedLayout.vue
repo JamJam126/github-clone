@@ -4,7 +4,7 @@
         className="flex flex-col h-screen"
         v-if="$page.props.auth.user"
     >
-        <Navigation />
+        <Navigation v-if="!hideDefaultNav" />
 
         <main className="flex-grow text-white flex ">
 
@@ -47,6 +47,10 @@ defineProps({
         type: String,
         required: true,
     },
+    hideDefaultNav: {
+        type: Boolean,
+        default: false
+    }
 });
 
 </script>
