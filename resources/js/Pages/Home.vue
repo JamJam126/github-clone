@@ -75,12 +75,11 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import { defineProps } from "vue";
-import axios from "axios";
-// import { Inertia } from '@inertiajs/vue3';
 
 const props = defineProps({
     repos: Array,
+    
 });
 
-// console.log(repos);
+
 </script>

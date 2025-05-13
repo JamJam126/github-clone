@@ -57,9 +57,7 @@
                         <PrimaryButton class="" 
                                     @click.prevent="commitFiles">
                                     Commit</PrimaryButton
-                                    >
-
-                        
+                                    >                        
                     </div>
                 </div>
             </div>
