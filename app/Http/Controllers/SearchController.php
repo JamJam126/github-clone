@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Content;
 use App\Models\Repo;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,13 +21,14 @@ class SearchController extends Controller
         }
 
         else if ($type === "User") {
-            $result = User::where('name', 'LIKE', "%{$query}%")->get();    
+            $result = User::where('name', 'LIKE', "%{$query}%")->get();
         }
-
-        else {
-            return response()->json([
-                'Error' => 'Invalid search type.'
-            ], 404);
+        // Default type to code since github did that
+        else if ($type === "code") {
+            $query = base64_encode($query);
+            $result = Content::where("content", "LIKE", "%{$query}%")->get();
+        } else {
+            $result = Repo::where('name', 'LIKE', "%{$query}%")->get();
         }
 
         return Inertia::render('SearchResult', [
