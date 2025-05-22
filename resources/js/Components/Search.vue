@@ -24,7 +24,7 @@
     const submitSearch = () => {
         if (form.search.trim()) router.get('/search', { 
             q: form.search,
-            type: "User",
-         })
+            type: "Repos",
+        })
     }
 </script>

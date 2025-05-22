@@ -16,25 +16,40 @@ class SearchController extends Controller
         $query = $request->input('q');
         $type = $request->input('type');
 
-        if ($type === "Repo") {
-            $result = Repo::where('name', 'LIKE' ,"%{$query}%")->get();
+        if ($type === "Repos") {
+            $result = Repo::select('repos.*', 'user.name as user')
+                          ->join('users as user', 'user.id', '=', 'repos.user_id')
+                          ->where('repos.name', 'LIKE' ,"%{$query}%")
+                          ->get();
         }
 
-        else if ($type === "User") {
-            $result = User::where('name', 'LIKE', "%{$query}%")->get();
-        }
-        // Default type to code since github did that
-        else if ($type === "code") {
-            $query = base64_encode($query);
-            $result = Content::where("content", "LIKE", "%{$query}%")->get();
-        } else {
-            $result = Repo::where('name', 'LIKE', "%{$query}%")->get();
+        else if ($type === "Users") {
+            $result = User::where('name', 'LIKE', "%{$query}%")->get();    
         }
 
+        else if ($type === "Code") {
+            $encodedQuery = base64_encode($query);
+            $encodedContent = Content::where('content', 'LIKE', "%{$encodedQuery}%")->get();
+        }
+
+        else {
+            return response()->json([
+                'Error' => 'Invalid search type.'
+            ], 404);
+        }
+
+        // return response()->json([
+        //     'encodedQuery' => $encodedQuery,
+        //     'encodedContent' => $encodedContent,
+        // ]);
+
+        // dd($result);
         return Inertia::render('SearchResult', [
             'result' => $result,
             'query' => $query,
+            'type' => $type,
         ]);
+
         // return response()->json([
         //     'query' => $query,
         //     'type' => $type,

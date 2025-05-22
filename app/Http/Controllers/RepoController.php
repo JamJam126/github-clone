@@ -476,9 +476,9 @@ class RepoController extends Controller
     {
         // $starStatus = $request->input('star');
 
+        $userId = Auth::id();
+        $text = ""; // FOR DEBUGGING    
 
-        $userId = User::select('id')->where('name', $user)->value('id');
-        $text = ""; // FOR DEBUGGING
         $starStatus = filter_var($star, FILTER_VALIDATE_BOOLEAN); // THIS WILL CONVERT TO BOOLEAN
 
         if ($starStatus === true) {
@@ -495,7 +495,7 @@ class RepoController extends Controller
                 ->where('repo_id', $repoId)
                 ->delete();
 
-            Repo::find($repoId)->decrement('total_stars');
+            Repo::find($repoId)->decrement+('total_stars');
             $text = "Unstarred";
         }
 
