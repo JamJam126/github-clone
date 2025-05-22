@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout :hideDefaultNav="true">
         <div class="w-full bg-gray-950 ">
-            
+
             <RepoNav />
             <div class="flex flex-col w-full h-full">
                 <div class="bg-gray-950 w-full flex h-full  ">
@@ -10,12 +10,12 @@
                         <ul v-if="repo_tree" class="px-4 mt-4">
                             <li v-for="(item, index) in repo_tree" :key="item.id" class="flex flex-col">
                                 <Folder :repo_owner="repo_owner"
-                                        :name="item.name" 
-                                        :type="item.type" 
-                                        :repo_name="repo.name" 
+                                        :name="item.name"
+                                        :type="item.type"
+                                        :repo_name="repo.name"
                                         :file_id="item.id"
-                                        :index="index" 
-                                        :array="array" 
+                                        :index="index"
+                                        :array="array"
                                         :folderPath="currPath"
                                         @handle-expansion="handleFolderExpansion" />
                             </li>
@@ -24,7 +24,7 @@
 
                     <div class="flex flex-col w-full flex-1 px-4">
                         <ul class="font-semibold  h-12 pt-2 flex gap-1 items-center ">
-                            <li> 
+                            <li>
                                 <Link class="flex gap-2 text-blue-400"
                                 :href="route('repo.show', {
                                         user: repo_owner,
@@ -35,11 +35,11 @@
                                 >
                             </li>
                             <li class="flex gap-1"
-                                v-for="directory in arrayDirectoryPath" 
+                                v-for="directory in arrayDirectoryPath"
                                 :key="directory.index">
                                 <p>/</p>
 
-                                <Link class="flex gap-2 text-blue-400" 
+                                <Link class="flex gap-2 text-blue-400"
                                     v-if="directory.index !== arrayDirectoryPath.length - 1"
                                     :href="route('repo.folderhandle', {
                                         user: repo_owner,
@@ -50,9 +50,9 @@
                                 >
 
                                 <p v-else>{{ directory.folder }}</p>
-                                
+
                             </li>
-                            
+
                         </ul>
 
                         <div class="mt-2 w-full">
@@ -83,7 +83,7 @@
                                         </Link>
                                     </div>
                                 </div>
-                                
+
                                 <div class="border border-zinc-700 mt-4 rounded-lg"
                                      v-if="!content"
                                 >
@@ -119,7 +119,7 @@
                                     </ul>
                                     <ul v-if="files" class="">
                                         <li v-for="file in files" :key="file.id"
-                                            class="h-10 content-center border-t border-t-zinc-700 px-4 grid 
+                                            class="h-10 content-center border-t border-t-zinc-700 px-4 grid
                                                    grid-cols-[40%,auto,124px] items-center"
                                         >
                                             <Link class="flex gap-2" :href="route('repo.filehandler', {
@@ -140,9 +140,9 @@
 
                                     </ul>
                                 </div>
-                                <div v-else 
+                                <div v-else
                                     class="mt-4 rounded-lg">
-                                    <DisplayFileContent :content="content"/>
+                                    <DisplayFileContent :content="content" :filename="filename"/>
                                 </div>
                             </div>
 
@@ -155,8 +155,8 @@
 
             </div>
         </div>
-        
-        
+
+
     </AuthenticatedLayout>
 </template>
 
@@ -170,7 +170,7 @@ import RepoNav from '@/Components/RepoNav.vue';
 import DisplayFileContent from './DisplayFileContent.vue';
 
 const props = defineProps({
-
+    filename: String,
     repo: Object,
     files: Array,
     folders: Array,

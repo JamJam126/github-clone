@@ -191,7 +191,7 @@ const successMessage = ref("");
 const createRepository = () => {
     form.post(route("repos.store"), {
         onSuccess: () => {
-            successMessage.value = `The repository "${form.name}" was created successfully!`;
+            
             form.reset();
         },
         onError: () => {
