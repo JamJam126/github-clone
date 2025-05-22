@@ -1,19 +1,20 @@
 <template>
     <div class="w-full">
         <pre v-if="content" class="code-container w-full h-[90%] flex bg-black border border-gray-500">
-            <code ref="codeBlock" class="language-java">{{ content }}</code>
+            <code ref="codeBlock" :class="language">{{ content }}</code>
         </pre>
     </div>
 </template>
 
 <script setup>
     import { onMounted, ref, watch } from 'vue';
-    import Prism from 'prismjs';
+    import Prism, { languages } from 'prismjs';
     import "prismjs/themes/prism.css";
-    import 'prismjs/components/prism-java.min.js'; 
+    import 'prismjs/components/prism-java.min.js';
 
     const props = defineProps({
-        content: String
+        content: String,
+        language: String
     });
 
     const codeBlock = ref(null);
@@ -26,7 +27,7 @@
 
     onMounted(highlightCode);
 
-    watch(() => props.content, highlightCode); 
+    watch(() => props.content, highlightCode);
 </script>
 
 <style scoped>
